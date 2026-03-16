@@ -1,434 +1,327 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
 
-<head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>موسوعة النور</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Amiri&display=swap" rel="stylesheet">
-
-<style>
-
-body{
-
-font-family:'Cairo';
-
-background:#f5f5f5;
-
-}
-
-.quran{
-
-font-family:'Amiri';
-
-font-size:24px;
-
-line-height:2.2;
-
-}
-
-.card{
-
-background:white;
-
-padding:20px;
-
-border-radius:15px;
-
-box-shadow:0 5px 20px rgba(0,0,0,0.05);
-
-}
-
-.page{
-
-display:none;
-
-}
-
-.page.active{
-
-display:block;
-
-}
-
+<html lang="ar" dir="rtl">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>موسوعة النور - النسخة الذهبية</title>  
+    <script src="https://cdn.tailwindcss.com"></script>  
+    <script src="https://unpkg.com/lucide@latest"></script>  
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">  
+    <style>  
+        :root { --gold: #c5a059; --emerald: #064e3b; }  
+        body { font-family: 'Cairo', sans-serif; background: #f8fafc; margin: 0; }  
+        .quran-font { font-family: 'Amiri', serif; }  
+        .royal-card { background: white; border-radius: 1.5rem; border: 1px solid rgba(197, 160, 89, 0.2); box-shadow: 0 4px 20px rgba(0,0,0,0.03); transition: 0.3s; }  
+        .page { display: none; animation: fadeIn 0.5s ease; padding-bottom: 100px; }  
+        .page.active { display: block; }  
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }  
+        .nav-item.active { color: var(--emerald); font-weight: 900; border-top: 3px solid var(--gold); }  
+        .active-ayah { background: #fef3c7; border-right: 4px solid var(--gold); padding: 5px; border-radius: 4px; }  
+        .wheel-spin { animation: spin 4s cubic-bezier(0.15, 0, 0.15, 1) forwards; }  
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(1800deg); } }  /* تصميم النافذة المنبثقة للآية */  
+    #wheel-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }  
+    #wheel-modal.active { display: flex; }  
 </style>
 
-</head>
-
-<body class="p-4 max-w-3xl mx-auto">
-
-
-
-<h1 class="text-2xl font-black text-center mb-6">
-
-موسوعة النور الإسلامية
-
-</h1>
-
-
-
-<div class="flex flex-wrap gap-2 justify-center mb-6">
-
-<button onclick="nav('home')" class="card">الرئيسية</button>
-
-<button onclick="nav('quran')" class="card">المصحف</button>
-
-<button onclick="nav('hadith')" class="card">الحديث</button>
-
-<button onclick="nav('azkar')" class="card">الأذكار</button>
-
-<button onclick="nav('tasbeeh')" class="card">السبحة</button>
-
-<button onclick="nav('wheel')" class="card">آية عشوائية</button>
-
-</div>
-
-
-
-<!-- الصفحة الرئيسية -->
-
-<div id="home" class="page active">
-
-<div class="card">
-
-<h2 class="font-bold mb-4">مواقيت الصلاة</h2>
-
-<div id="prayers"></div>
-
-</div>
-
-</div>
-
-
-
-<!-- القرآن -->
-
-<div id="quran" class="page">
-
-<div class="card">
-
-<h2 class="font-bold mb-4">سور القرآن</h2>
-
-<div id="surahs"></div>
-
-</div>
-
-
-
-<div id="ayahs" class="card mt-4 quran"></div>
-
-<audio id="audio" controls class="w-full mt-4"></audio>
-
-</div>
-
-
-
-<!-- الحديث -->
-
-<div id="hadith" class="page">
-
-<div class="card mb-4">
-
-<h2 class="font-bold mb-4">كتب الحديث</h2>
-
-
-
-<div class="flex flex-wrap gap-2">
-
-<button onclick="hadith('bukhari')" class="card">البخاري</button>
-
-<button onclick="hadith('muslim')" class="card">مسلم</button>
-
-<button onclick="hadith('tirmidhi')" class="card">الترمذي</button>
-
-<button onclick="hadith('abudawud')" class="card">أبو داود</button>
-
-<button onclick="hadith('nasai')" class="card">النسائي</button>
-
-<button onclick="hadith('ibnumajah')" class="card">ابن ماجه</button>
-
-</div>
-
-</div>
-
-
-
-<div id="hadiths"></div>
-
-</div>
-
-
-
-<!-- الأذكار -->
-
-<div id="azkar" class="page">
-
-<div class="card">
-
-<h2 class="font-bold mb-4">أذكار حصن المسلم</h2>
-
-<div id="azkarList"></div>
-
-</div>
-
-</div>
-
-
-
-<!-- السبحة -->
-
-<div id="tasbeeh" class="page text-center">
-
-<div class="card">
-
-<h2 class="text-xl font-bold mb-6">السبحة الإلكترونية</h2>
-
-
-
-<p id="zekr" class="text-xl mb-4">سبحان الله</p>
-
-
-
-<div id="count" class="text-5xl font-black mb-6">
-
-0
-
-</div>
-
-
-
-<button onclick="tasbeeh()" class="bg-green-700 text-white px-6 py-3 rounded">
-
-تسبيح
-
-</button>
-
-
-
-<button onclick="reset()" class="block mx-auto mt-4 text-red-500">
-
-إعادة
-
-</button>
-
-</div>
-
-</div>
-
-
-
-<!-- عجلة الآية -->
-
-<div id="wheel" class="page text-center">
-
-<div class="card">
-
-<h2 class="font-bold mb-6">آية عشوائية</h2>
-
-
-
-<button onclick="randomAyah()" class="bg-green-700 text-white px-6 py-3 rounded">
-
-إظهار آية
-
-</button>
-
-
-
-<p id="randomAyah" class="quran mt-6"></p>
-
-</div>
-
-</div>
-
-
-
-<script>
-
-
-
-function nav(id){
-
-document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"))
-
-document.getElementById(id).classList.add("active")
-
-}
-
-
-
-///// مواقيت الصلاة
-
-fetch("https://api.aladhan.com/v1/timingsByCity?city=Cairo&country=Egypt&method=5")
-
-.then(r=>r.json())
-
-.then(d=>{
-
-let t=d.data.timings
-
-document.getElementById("prayers").innerHTML=`
-
-الفجر : ${t.Fajr}<br>
-
-الظهر : ${t.Dhuhr}<br>
-
-العصر : ${t.Asr}<br>
-
-المغرب : ${t.Maghrib}<br>
-
-العشاء : ${t.Isha}
-
-`
-
-})
-
-
-
-///// السور
-
-fetch("https://api.alquran.cloud/v1/surah")
-
-.then(r=>r.json())
-
-.then(d=>{
-
-document.getElementById("surahs").innerHTML=d.data.map(s=>`
-
-<button onclick="openSurah(${s.number})" class="card m-1">
-
-${s.number} - ${s.name}
-
-</button>
-
-`).join("")
-
-})
-
-
-
-function openSurah(n){
-
-fetch(`https://api.alquran.cloud/v1/surah/${n}/ar.alafasy`)
-
-.then(r=>r.json())
-
-.then(d=>{
-
-document.getElementById("ayahs").innerHTML=d.data.ayahs.map(a=>a.text).join(" ")
-
-document.getElementById("audio").src=d.data.ayahs[0].audio
-
-})
-
-}
-
-
-
-//// الحديث
-
-function hadith(book){
-
-fetch(`https://hadis-api-id.vercel.app/hadith/${book}?range=1-20`)
-
-.then(r=>r.json())
-
-.then(d=>{
-
-document.getElementById("hadiths").innerHTML=d.items.map(h=>`
-
-<div class="card mb-3">
-
-${h.arab}
-
-</div>
-
-`).join("")
-
-})
-
-}
-
-
-
-//// الأذكار
-
-fetch("https://www.hisnmuslim.com/api/ar/husn_ar.json")
-
-.then(r=>r.json())
-
-.then(d=>{
-
-document.getElementById("azkarList").innerHTML=d.slice(0,40).map(z=>`
-
-<div class="card mb-3">
-
-<h3 class="font-bold mb-2">${z.title}</h3>
-
-<p>${z.content}</p>
-
-</div>
-
-`).join("")
-
-})
-
-
-
-//// السبحة
-
-let c=0
-
-function tasbeeh(){
-
-c++
-
-document.getElementById("count").innerText=c
-
-}
-
-
-
-function reset(){
-
-c=0
-
-document.getElementById("count").innerText=0
-
-}
-
-
-
-//// آية عشوائية
-
-function randomAyah(){
-
-let r=Math.floor(Math.random()*6236)+1
-
-fetch(`https://api.alquran.cloud/v1/ayah/${r}/ar.alafasy`)
-
-.then(r=>r.json())
-
-.then(d=>{
-
-document.getElementById("randomAyah").innerText=d.data.text
-
-})
-
-}
-
-
-
-</script>
-
-
-
-</body>
-
-</html>
+</head>  
+<body class="text-slate-800">  <audio id="azan-audio" src="https://www.islamcan.com/common/makkah-azan.mp3" preload="auto"></audio>
+
+<div id="wheel-modal">  
+    <div class="bg-white rounded-[2rem] p-8 max-w-lg w-full text-center relative shadow-2xl border-4 border-gold">  
+        <button onclick="closeWheelModal()" class="absolute top-4 left-4 text-slate-400 hover:text-rose-500"><i data-lucide="x-circle"></i></button>  
+        <div class="bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-700">  
+            <i data-lucide="sparkles"></i>  
+        </div>  
+        <h3 class="font-black text-emerald-900 mb-4">آية من الذكر الحكيم</h3>  
+        <div id="modal-ayah-text" class="quran-font text-2xl leading-relaxed text-slate-800 mb-6 italic"></div>  
+        <div id="modal-ayah-info" class="text-sm font-bold text-gold"></div>  
+        <button onclick="closeWheelModal()" class="mt-6 bg-emerald-900 text-white px-8 py-3 rounded-full font-bold shadow-lg active:scale-95 transition-all">آمنت بالله</button>  
+    </div>  
+</div>  <header class="sticky top-0 bg-white/80 backdrop-blur-lg border-b p-4 flex justify-between items-center z-50">  
+    <div class="flex items-center gap-2">  
+        <div class="bg-emerald-800 text-white p-2 rounded-lg"><i data-lucide="shield-check"></i></div>  
+        <div>  
+            <h1 class="text-sm font-black text-emerald-900">موسوعة النور</h1>  
+            <p id="live-clock" class="text-[10px] font-bold text-amber-600">00:00:00</p>  
+        </div>  
+    </div>  
+    <button onclick="requestNotify()" id="notif-btn" class="text-[10px] bg-amber-100 text-amber-800 px-3 py-1 rounded-full font-bold">تفعيل الأذان 🔔</button>  
+</header>  <main class="p-4 max-w-2xl mx-auto">  
+    <section id="home" class="page active">  
+        <div class="royal-card bg-emerald-900 p-8 text-center text-white mb-6 overflow-hidden relative">  
+            <div class="relative z-10">  
+                <p class="text-xs opacity-80 mb-1">الصلاة القادمة</p>  
+                <h2 id="next-prayer-name" class="text-4xl font-black mb-3 italic">--:--</h2>  
+                <div id="countdown" class="text-2xl font-mono bg-white/10 inline-block px-6 py-2 rounded-full border border-white/20">00:00:00</div>  
+            </div>  
+            <i data-lucide="moon" class="absolute -bottom-10 -left-10 w-40 h-40 opacity-10"></i>  
+        </div>  <div class="grid grid-cols-4 gap-2 mb-8">  
+        <button onclick="navTo('quran')" class="royal-card p-3 flex flex-col items-center gap-1"><i data-lucide="book-open" class="text-emerald-600"></i><span class="text-[10px] font-bold">المصحف</span></button>  
+        <button onclick="navTo('hadith')" class="royal-card p-3 flex flex-col items-center gap-1"><i data-lucide="library" class="text-amber-600"></i><span class="text-[10px] font-bold">الحديث</span></button>  
+        <button onclick="navTo('wheel')" class="royal-card p-3 flex flex-col items-center gap-1"><i data-lucide="star" class="text-blue-600"></i><span class="text-[10px] font-bold">العجلة</span></button>  
+        <button onclick="navTo('home')" class="royal-card p-3 flex flex-col items-center gap-1"><i data-lucide="layout" class="text-rose-600"></i><span class="text-[10px] font-bold">الأذكار</span></button>  
+    </div>  
+
+    <h3 class="font-black mb-4 flex items-center gap-2"><i data-lucide="clock-3" class="w-4"></i> مواقيت الصلاة بتوقيتك المحلي</h3>  
+    <div id="prayer-list" class="space-y-3"></div>  
+</section>  
+
+<section id="quran" class="page">  
+    <div class="royal-card p-4 mb-4">  
+        <label class="text-[10px] font-black text-slate-400 block mb-2">اختر القارئ الصوتي:</label>  
+        <select id="reader-select" class="w-full font-bold bg-slate-50 p-2 rounded-lg outline-none border-none">  
+            <option value="ar.alafasy">مشاري العفاسي</option>  
+            <option value="ar.minshawi">محمد صديق المنشاوي</option>  
+            <option value="ar.husary">محمود خليل الحصري</option>  
+            <option value="ar.abdulsamad">عبد الباسط عبد الصمد</option>  
+            <option value="ar.mahermuaiqly">ماهر المعيقلي</option>  
+            <option value="ar.saoodshuraym">سعود الشريم</option>  
+            <option value="ar.sudais">عبد الرحمن السديس</option>  
+            <option value="ar.ahmedajamy">أحمد العجمي</option>  
+        </select>  
+    </div>  
+    <div id="surah-list" class="grid grid-cols-1 gap-2"></div>  
+</section>  
+
+<section id="reader-view" class="page">  
+    <div class="flex items-center gap-4 mb-6">  
+        <button onclick="navTo('quran')" class="p-2 bg-white rounded-full shadow"><i data-lucide="chevron-right"></i></button>  
+        <h2 id="current-surah-title" class="text-2xl font-black text-emerald-900"></h2>  
+    </div>  
+    <div id="surah-content" class="royal-card p-8 quran-font text-3xl leading-[3] text-right"></div>  
+</section>  
+
+<section id="hadith" class="page">  
+    <div class="grid grid-cols-2 gap-3 mb-6">  
+        <button onclick="fetchHadith('bukhari')" class="royal-card p-4 font-black text-xs hover:bg-emerald-900 hover:text-white transition">صحيح البخاري</button>  
+        <button onclick="fetchHadith('muslim')" class="royal-card p-4 font-black text-xs hover:bg-emerald-900 hover:text-white transition">صحيح مسلم</button>  
+        <button onclick="fetchHadith('tirmidhi')" class="royal-card p-4 font-black text-xs hover:bg-emerald-900 hover:text-white transition">سنن الترمذي</button>  
+        <button onclick="fetchHadith('abudawud')" class="royal-card p-4 font-black text-xs hover:bg-emerald-900 hover:text-white transition">سنن أبي داود</button>  
+        <button   
+        <button onclick="fetchHadith('ibnumajah')" class="royal-card p-4 font-black text-xs hover:bg-emerald-900 hover:text-white transition">سنن ابن ماجه</button>  
+    </div>  
+    <div id="hadith-content" class="space-y-4">  
+        <p class="text-center text-slate-400 font-bold py-10">اختر كتاباً لعرض الأحاديث الشريفة..</p>  
+    </div>  
+</section>  
+
+<section id="wheel" class="page text-center">  
+    <div class="flex justify-center py-10">  
+        <div id="wheel-circle" class="w-64 h-64 border-[10px] border-gold rounded-full flex items-center justify-center bg-white shadow-2xl relative">  
+            <div class="font-black text-emerald-900 text-xl">نور الهدى</div>  
+            <div class="absolute -top-4 left-1/2 -translate-x-1/2 text-rose-600"><i data-lucide="navigation-2" style="transform: rotate(180deg)"></i></div>  
+        </div>  
+    </div>  
+    <button onclick="spinTheWheel()" id="spin-btn" class="bg-emerald-900 text-white px-12 py-4 rounded-full font-black text-lg shadow-xl active:scale-95 transition flex items-center gap-3 mx-auto">  
+        <i data-lucide="refresh-cw"></i> تدوير العجلة الآن  
+    </button>  
+</section>
+
+</main>  <div id="player-bar" class="fixed bottom-24 left-4 right-4 bg-white border border-gold/30 p-4 rounded-2xl shadow-2xl flex items-center justify-between hidden z-[1000]">  
+    <div class="flex items-center gap-3">  
+        <button onclick="toggleAudio()" id="main-play-btn" class="w-12 h-12 bg-emerald-900 text-white rounded-full flex items-center justify-center"><i data-lucide="play"></i></button>  
+        <div>  
+            <p id="player-status" class="text-[10px] font-black text-emerald-900 uppercase">جاري الترتيل</p>  
+            <p id="player-info" class="text-[9px] text-slate-400 font-bold">اسم القارئ - الآية</p>  
+        </div>  
+    </div>  
+    <div class="flex gap-2">  
+        <button onclick="changeAyah(-1)" class="p-2"><i data-lucide="skip-forward" class="w-5"></i></button>  
+        <button onclick="changeAyah(1)" class="p-2"><i data-lucide="skip-back" class="w-5"></i></button>  
+    </div>  
+    <audio id="main-audio"></audio>  
+</div>  <nav class="fixed bottom-0 inset-x-0 bg-white border-t p-4 flex justify-around items-center z-50 rounded-t-[2rem] shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">  
+    <button onclick="navTo('home')" id="n-home" class="nav-item active flex flex-col items-center gap-1 transition-all"><i data-lucide="home"></i><span class="text-[9px]">الرئيسية</span></button>  
+    <button onclick="navTo('quran')" id="n-quran" class="nav-item flex flex-col items-center gap-1 transition-all"><i data-lucide="book-open"></i><span class="text-[9px]">المصحف</span></button>  
+    <button onclick="navTo('hadith')" id="n-hadith" class="nav-item flex flex-col items-center gap-1 transition-all"><i data-lucide="library"></i><span class="text-[9px]">الحديث</span></button>  
+    <button onclick="navTo('wheel')" id="n-wheel" class="nav-item flex flex-col items-center gap-1 transition-all"><i data-lucide="refresh-cw"></i><span class="text-[9px]">العجلة</span></button>  
+</nav>  <script>  
+const audio = document.getElementById('main-audio');  
+const azanAudio = document.getElementById('azan-audio');  
+let ayahs = [], currentAyahIdx = 0, prayers = {}, lastAzanTrigger = "";  
+  
+// --- 1. الأذان والمواقيت ---  
+async function requestNotify() {  
+    const permission = await Notification.requestPermission();  
+    if(permission === 'granted') {  
+        alert("تم تفعيل الإشعارات والأذان!");  
+        // تشغيل صوت صامت لتفعيل الأذان في المتصفح  
+        azanAudio.play().then(() => azanAudio.pause());  
+    }  
+}  
+  
+async function initPrayers() {  
+    try {  
+        const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=Cairo&country=Egypt&method=4`);  
+        const data = await res.json();  
+        prayers = data.data.timings;  
+        renderPrayers();  
+    } catch { console.error("Error fetching prayers"); }  
+}  
+  
+function renderPrayers() {  
+    const names = {Fajr:'الفجر', Dhuhr:'الظهر', Asr:'العصر', Maghrib:'المغرب', Isha:'العشاء'};  
+    document.getElementById('prayer-list').innerHTML = Object.entries(names).map(([k,v]) => `  
+        <div class="flex justify-between items-center p-4 royal-card">  
+            <span class="font-black text-slate-600">${v}</span>  
+            <span class="font-mono font-black text-emerald-800">${prayers[k]}</span>  
+        </div>  
+    `).join('');  
+}  
+  
+function checkPrayerTimes() {  
+    const now = new Date();  
+    const timeStr = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');  
+      
+    // تشغيل الأذان  
+    const pKeys = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];  
+    pKeys.forEach(key => {  
+        if(prayers[key] === timeStr && lastAzanTrigger !== timeStr) {  
+            lastAzanTrigger = timeStr;  
+            azanAudio.play();  
+            if(Notification.permission === 'granted') {  
+                new Notification("حان الآن موعد الصلاة", { body: "حي على الصلاة.. حي على الفلاح" });  
+            }  
+        }  
+    });  
+  
+    // العد التنازلي  
+    const order = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];  
+    let next = null;  
+    for(let p of order) {  
+        const [h,m] = prayers[p].split(':');  
+        const d = new Date(); d.setHours(h,m,0);  
+        if(d > now) { next = {n:p, d:d}; break; }  
+    }  
+    if(!next) {  
+        const [h,m] = prayers.Fajr.split(':');  
+        const d = new Date(); d.setDate(d.getDate()+1); d.setHours(h,m,0);  
+        next = {n:'Fajr', d:d};  
+    }  
+    const diff = next.d - now;  
+    const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);  
+    const names = {Fajr:'الفجر', Dhuhr:'الظهر', Asr:'العصر', Maghrib:'المغرب', Isha:'العشاء'};  
+    document.getElementById('next-prayer-name').innerText = names[next.n] || 'الفجر';  
+    document.getElementById('countdown').innerText = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;  
+}  
+  
+// --- 2. القرآن ---  
+async function loadSurahs() {  
+    const res = await fetch('https://api.alquran.cloud/v1/surah');  
+    const data = await res.json();  
+    document.getElementById('surah-list').innerHTML = data.data.map(s => `  
+        <div onclick="openSurah(${s.number})" class="royal-card p-4 flex justify-between items-center cursor-pointer active:scale-95">  
+            <span class="font-black text-emerald-900">${s.number}. ${s.name}</span>  
+            <div class="text-[9px] bg-slate-100 px-2 py-1 rounded text-slate-500">${s.numberOfAyahs} آية</div>  
+        </div>  
+    `).join('');  
+    lucide.createIcons();  
+}  
+  
+async function openSurah(n) {  
+    navTo('reader-view');  
+    const reader = document.getElementById('reader-select').value;  
+    document.getElementById('surah-content').innerText = "جاري تحميل كلام الله...";  
+    const res = await fetch(`https://api.alquran.cloud/v1/surah/${n}/editions/quran-uthmani,${reader}`);  
+    const data = await res.json();  
+      
+    ayahs = data.data[1].ayahs;  
+    const texts = data.data[0].ayahs;  
+    document.getElementById('current-surah-title').innerText = data.data[0].name;  
+    document.getElementById('surah-content').innerHTML = texts.map((a,i) => `  
+        <span id="ay-${i}" class="ayah-item cursor-pointer" onclick="playAyah(${i})">${a.text} <span class="text-gold font-bold">﴿${a.numberInSurah}﴾</span></span>  
+    `).join(' ');  
+      
+    document.getElementById('player-bar').classList.remove('hidden');  
+    playAyah(0);  
+}  
+  
+function playAyah(i) {  
+    if(i < 0 || i >= ayahs.length) return;  
+    currentAyahIdx = i;  
+    audio.src = ayahs[i].audio;  
+    audio.play();  
+    document.querySelectorAll('.ayah-item').forEach(el => el.classList.remove('active-ayah'));  
+    const active = document.getElementById(`ay-${i}`);  
+    if(active) {  
+        active.classList.add('active-ayah');  
+        active.scrollIntoView({behavior:'smooth', block:'center'});  
+    }  
+    document.getElementById('player-info').innerText = `آية رقم ${i+1}`;  
+}  
+  
+function toggleAudio() { audio.paused ? audio.play() : audio.pause(); }  
+function changeAyah(d) { playAyah(currentAyahIdx + d); }  
+audio.onended = () => changeAyah(1);  
+audio.onplay = () => { document.getElementById('main-play-btn').innerHTML = '<i data-lucide="pause"></i>'; lucide.createIcons(); }  
+audio.onpause = () => { document.getElementById('main-play-btn').innerHTML = '<i data-lucide="play"></i>'; lucide.createIcons(); }  
+  
+// --- 3. الحديث ---  
+async function fetchHadith(book) {  
+    const container = document.getElementById('hadith-content');  
+    container.innerHTML = '<p class="text-center py-10 animate-pulse">جاري جلب 100 حديث...</p>';  
+    try {  
+        const res = await fetch(`https://hadis-api-id.vercel.app/hadith/${book}?range=1-100`);  
+        const data = await res.json();  
+        container.innerHTML = data.items.map(h => `  
+            <div class="royal-card p-6 border-r-4 border-gold shadow-sm">  
+                <p class="font-bold text-emerald-900 leading-relaxed mb-4">${h.arab}</p>  
+                <div class="flex justify-between text-[10px] text-slate-400 font-black italic">  
+                    <span>الكتاب: ${book.toUpperCase()}</span>  
+                    <span>رقم: ${h.number}</span>  
+                </div>  
+            </div>  
+        `).join('');  
+    } catch { container.innerHTML = '<p class="text-center text-rose-500 py-10 font-bold">عذراً، تعذر الاتصال بمكتبة الأحاديث.</p>'; }  
+}  
+  
+// --- 4. العجلة والتبويب المنبثق ---  
+function spinTheWheel() {  
+    const wheel = document.getElementById('wheel-circle');  
+    const btn = document.getElementById('spin-btn');  
+      
+    wheel.classList.remove('wheel-spin');  
+    void wheel.offsetWidth;  
+    wheel.classList.add('wheel-spin');  
+    btn.disabled = true;  
+  
+    setTimeout(async () => {  
+        try {  
+            const r = Math.floor(Math.random() * 6236) + 1;  
+            const res = await fetch(`https://api.alquran.cloud/v1/ayah/${r}/ar.alafasy`);  
+            const data = await res.json();  
+              
+            document.getElementById('modal-ayah-text').innerText = data.data.text;  
+            document.getElementById('modal-ayah-info').innerText = `[ سورة ${data.data.surah.name} - آية ${data.data.numberInSurah} ]`;  
+            document.getElementById('wheel-modal').classList.add('active');  
+        } catch(e) { alert("حدث خطأ أثناء جلب الآية"); }  
+        btn.disabled = false;  
+        lucide.createIcons();  
+    }, 4000);  
+}  
+  
+function closeWheelModal() {  
+    document.getElementById('wheel-modal').classList.remove('active');  
+}  
+  
+// --- 5. الملاحة ---  
+function navTo(id) {  
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));  
+    document.getElementById(id).classList.add('active');  
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));  
+    if(document.getElementById('n-'+id)) document.getElementById('n-'+id).classList.add('active');  
+    window.scrollTo(0,0);  
+    lucide.createIcons();  
+}  
+  
+setInterval(() => {  
+    document.getElementById('live-clock').innerText = new Date().toLocaleTimeString('ar-EG');  
+    checkPrayerTimes();  
+}, 1000);  
+  
+initPrayers();  
+loadSurahs();  
+lucide.createIcons();  
+</script>  </body>  
+</html>  
