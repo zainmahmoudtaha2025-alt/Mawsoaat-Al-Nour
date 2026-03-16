@@ -263,39 +263,13 @@ function playAyah(i) {
     }
     document.getElementById('player-info').innerText = `آية رقم ${i+1}`;
 }
-async function openSurah(n) {
-    navTo('reader-view');
-    // نحدد القارئ هنا (مثلاً العفاسي) أو نأخذه من القائمة
-    const reader = document.getElementById('reader-select').value || 'ar.alafasy';
-    
-    document.getElementById('surah-content').innerText = "جاري تحميل كلام الله...";
 
-    // 1. جلب النص العثماني فقط للعرض
-    const res = await fetch(`https://api.alquran.cloud/v1/surah/${n}/quran-uthmani`);
-    const data = await res.json();
-    const texts = data.data.ayahs;
+function toggleAudio() { audio.paused ? audio.play() : audio.pause(); }
+function changeAyah(d) { playAyah(currentAyahIdx + d); }
+audio.onended = () => changeAyah(1);
+audio.onplay = () => { document.getElementById('main-play-btn').innerHTML = '<i data-lucide="pause"></i>'; lucide.createIcons(); }
+audio.onpause = () => { document.getElementById('main-play-btn').innerHTML = '<i data-lucide="play"></i>'; lucide.createIcons(); } 
 
-    // 2. ضبط مصدر الصوت ليكون "السورة كاملة" بملف واحد
-    // الرابط المباشر للسور الكاملة بجودة 128kbps
-    audio.src = `https://cdn.islamic.network/quran/audio-surah/128/${reader}/${n}.mp3`;
-    audio.play();
-
-    // 3. عرض العنوان والنص
-    document.getElementById('current-surah-title').innerText = data.data.name;
-    document.getElementById('surah-content').innerHTML = texts.map((a, i) => `
-        <span id="ay-${i}" class="ayah-item text-2xl leading-[3rem] inline-block px-1">
-            ${a.text} <span class="text-gold font-bold text-sm">﴿${a.numberInSurah}﴾</span>
-        </span>
-    `).join(' ');
-
-    document.getElementById('player-bar').classList.remove('hidden');
-    document.getElementById('player-info').innerText = `تشغيل سورة ${data.data.name}`;
-}
-
-// تعديل وظيفة التحكم (بسيطة جداً الآن لأن الملف واحد)
-function toggleAudio() { 
-    audio.paused ? audio.play() : audio.pause(); 
-}
 
 // --- 3. الحديث ---
 async function fetchHadith(book) {
